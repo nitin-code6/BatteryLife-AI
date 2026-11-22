@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+artifacts/*.pt
+artifacts/*.pkl
+processed/*.npz
+.git/

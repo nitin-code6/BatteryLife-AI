@@ -1,0 +1,14 @@
+.git/
+.venv/
+venv/
+node_modules/
+raw/
+uploads/
+backend/uploads/
+ai-service/artifacts/
+ai-service/processed/
+.next/
+dist/
+*.log
+.env
+.env.*
