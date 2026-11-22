@@ -105,7 +105,36 @@ BatteryLife-AI/
 
 ## Quickstart & Local Setup
 
-### Prerequisites
+### Option A: Run with Docker Compose (Recommended - Single Command)
+
+Ensure [Docker](https://www.docker.com/) is installed and running, then start the entire multi-service stack with a single command:
+
+```bash
+docker-compose up --build
+```
+
+This will automatically spin up:
+1. `batterylife-mongo` (MongoDB 7 database on port `27017`)
+2. `batterylife-ai-service` (FastAPI + PyTorch engine on port `8000`)
+3. `batterylife-backend` (Express Gateway on port `4000`)
+4. `batterylife-frontend` (Next.js 15 UI on port `3000`)
+
+To run in detached/background mode:
+```bash
+docker-compose up -d --build
+```
+
+To view logs or stop services:
+```bash
+docker-compose logs -f
+docker-compose down
+```
+
+---
+
+### Option B: Manual Local Setup (Without Docker)
+
+#### Prerequisites
 * **Node.js** (v20+ recommended) and **npm**
 * **Python** (v3.10+ recommended)
 * **MongoDB** instance running locally on `mongodb://localhost:27017`
