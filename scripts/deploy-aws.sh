@@ -5,27 +5,17 @@
 
 set -e
 
-echo "=== [1/5] Updating system packages and installing prerequisites ==="
+echo "=== [1/4] Installing Docker and system packages ==="
 sudo apt-get update -y
-sudo apt-get install -y ca-certificates curl gnupg lsb-release git
-
-echo "=== [2/5] Installing Docker and Docker Compose ==="
-if ! command -v docker &> /dev/null; then
-    sudo mkdir -p /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update -y
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-    sudo usermod -aG docker "$USER"
-fi
+sudo apt-get install -y docker.io docker-compose-v2 git curl
+sudo systemctl enable --now docker
+sudo usermod -aG docker "$USER" || true
 
 # Detect public IP of the EC2 instance
-PUBLIC_IP=$(curl -s http://checkip.amazonaws.com || curl -s ifconfig.me || echo "localhost")
+PUBLIC_IP=$(curl -s http://checkip.amazonaws.com || curl -s ifconfig.me || echo "15.134.206.166")
 echo "Detected Public IP: $PUBLIC_IP"
 
-echo "=== [3/5] Configuring Environment Files ==="
+echo "=== [2/4] Configuring Environment Files ==="
 
 # Backend .env
 cat <<EOF > backend/.env
@@ -35,7 +25,7 @@ MONGODB_URI=mongodb+srv://nitin_code:nitincode@codindadda.jvtcgmz.mongodb.net/ba
 AI_SERVICE_URL=http://ai-service:8000
 EOF
 
-# Frontend .env (Points to the EC2 Public IP for browser access)
+# Frontend .env
 cat <<EOF > frontend/.env
 NEXT_PUBLIC_API_BASE_URL=http://${PUBLIC_IP}:4000
 EOF
@@ -47,11 +37,11 @@ PORT=8000
 ENVIRONMENT=production
 EOF
 
-echo "=== [4/5] Building and Launching Docker Containers ==="
-sudo docker compose down --remove-orphans || true
-sudo docker compose up -d --build
+echo "=== [3/4] Building and Launching Docker Containers ==="
+sudo docker compose -f docker-compose.prod.yml down --remove-orphans || true
+sudo docker compose -f docker-compose.prod.yml up -d --build
 
-echo "=== [5/5] Deployment Finished Successfully! ==="
+echo "=== [4/4] Deployment Finished Successfully! ==="
 echo "--------------------------------------------------------"
 echo "Frontend Dashboard: http://${PUBLIC_IP}:3000"
 echo "Backend API:        http://${PUBLIC_IP}:4000"

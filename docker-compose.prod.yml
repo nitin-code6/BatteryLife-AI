@@ -1,0 +1,67 @@
+services:
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: batterylife-ai-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - ENVIRONMENT=production
+    volumes:
+      - ai_artifacts:/app/artifacts
+      - ai_processed:/app/processed
+    networks:
+      - batterylife-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: batterylife-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - JWT_SECRET=8fe3fa5bf31ba070ecba2af9f60c5be32bd7f7440b8a150ee8a0ed49b4d57f1d
+      - MONGODB_URI=mongodb+srv://nitin_code:nitincode@codindadda.jvtcgmz.mongodb.net/battery_ai?retryWrites=true&w=majority
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      ai-service:
+        condition: service_healthy
+    networks:
+      - batterylife-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=http://15.134.206.166:4000
+    container_name: batterylife-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://15.134.206.166:4000
+    depends_on:
+      - backend
+    networks:
+      - batterylife-net
+
+networks:
+  batterylife-net:
+    driver: bridge
+
+volumes:
+  ai_artifacts:
+  ai_processed:
