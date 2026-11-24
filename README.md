@@ -207,6 +207,7 @@ Refer to [docs/API.md](docs/API.md) for full endpoint specifications.
 ## Documentation
 * [Architecture Guide](docs/ARCHITECTURE.md)
 * [API Reference](docs/API.md)
+* [AWS Cloud Deployment Guide](docs/AWS_DEPLOYMENT.md)
 * [Dataset & ETL Specifications](docs/DATASETS.md)
 * [LSTM-VAE Error Validations](LSTM_VAE_ERROR_FIXES.md)
 
