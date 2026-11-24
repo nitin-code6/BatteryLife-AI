@@ -7,9 +7,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Install PyTorch CPU-only wheel (150MB instead of 4GB CUDA dependencies)
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining dependencies without reinstalling CUDA torch
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN grep -v -i "^torch" requirements.txt > reqs.txt && pip install --no-cache-dir -r reqs.txt
 
 # Copy application source code
 COPY app/ ./app/
